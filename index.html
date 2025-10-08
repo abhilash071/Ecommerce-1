@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Arcade Commerce — Modern E‑commerce Demo</title>
+
+  <!-- Internal CSS (modern, glassy, animated) -->
+  <style>
+    /* ===== Theme & Reset ===== */
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --glass: rgba(255,255,255,0.04);
+      --accent-1:#6366f1; --accent-2:#06b6d4; --accent-grad: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+      --radius:14px; --shadow-sm: 0 6px 18px rgba(2,6,23,0.35); --shadow-lg: 0 20px 50px rgba(2,6,23,0.45);
+      --maxw:1200px; --ease:cubic-bezier(.2,.9,.3,1);
+      --glass-2: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    html{font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; -webkit-font-smoothing:antialiased}
+    body{margin:0;background: linear-gradient(180deg,#0b1220 0%, #071029 60%); color:#e6eef8; line-height:1.45}
+
+    a{color:inherit;text-decoration:none}
+
+    /* ===== Layout ===== */
+    .site{max-width:var(--maxw);margin:32px auto;padding:24px}
+    header.appbar{position:sticky;top:18px;z-index:60;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter: blur(8px);border-radius:18px;padding:12px 18px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:18px}
+
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:52px;height:52px;border-radius:12px;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:18px;box-shadow:var(--shadow-lg)}
+    .brand h1{font-size:1.1rem;margin:0}
+
+    nav.topnav{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .nav-link{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:600;transition:all .25s var(--ease);}
+    .nav-link:hover{color:white;background:var(--glass-2);transform:translateY(-3px)}
+
+    .badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:12px}
+
+    /* ===== Hero ===== */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:28px}
+    .hero-card{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:28px;border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;position:relative}
+    .kicker{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(99,102,241,0.12);color:var(--accent-1);font-weight:700}
+    .hero h2{font-size:2.05rem;margin:12px 0 8px}
+    .hero p{color:var(--muted);margin-bottom:18px}
+    .cta-row{display:flex;gap:12px}
+    .btn{padding:10px 16px;border-radius:12px;border:0;font-weight:700;cursor:pointer;transition:all .22s var(--ease)}
+    .btn-primary{background:var(--accent-grad);color:#fff;box-shadow:0 12px 30px rgba(99,102,241,0.18)}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)}
+
+    /* Animated product orb */
+    .hero-visual{height:360px;border-radius:16px;background: radial-gradient(circle at 20% 10%, rgba(99,102,241,0.12), transparent 10%), radial-gradient(circle at 80% 80%, rgba(6,182,212,0.08), transparent 8%), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.1));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .orb{width:240px;height:240px;border-radius:50%;background:conic-gradient(from 120deg, rgba(99,102,241,0.9), rgba(6,182,212,0.9));box-shadow:0 18px 60px rgba(6,12,30,0.6);transform:translateY(0);animation:float 6s ease-in-out infinite}
+    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-18px)}100%{transform:translateY(0)}}
+
+    /* ===== Products Grid ===== */
+    .section{margin-top:36px}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .section-title h3{margin:0}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+    .product{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:14px;box-shadow:var(--shadow-sm);transition:transform .24s var(--ease), box-shadow .24s var(--ease)}
+    .product:hover{transform:translateY(-8px);box-shadow:0 30px 60px rgba(2,6,23,0.6)}
+    .product-media{height:160px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#e2f8ff14,#f1f6ff12);display:flex;align-items:center;justify-content:center}
+    .product img{width:100%;height:100%;object-fit:cover}
+    .p-title{font-weight:700;margin:10px 0 6px;font-size:1rem}
+    .p-desc{color:var(--muted);font-size:0.92rem;margin-bottom:10px}
+    .p-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .price{font-weight:800;color:var(--accent-1)}
+
+    /* Add to cart floating action */
+    .add-btn{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));border-radius:10px;padding:8px 10px;color:white;border:0;font-weight:700;cursor:pointer}
+
+    /* ===== Sidebar / Cart panel ===== */
+    .cart-panel{position:fixed;right:20px;bottom:20px;width:340px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.14));border-radius:14px;padding:14px;box-shadow:var(--shadow-lg);backdrop-filter:blur(8px);z-index:80;transform:translateY(0);transition:all .28s var(--ease)}
+    .cart-header{display:flex;align-items:center;justify-content:space-between}
+    .cart-list{max-height:300px;overflow:auto;margin-top:12px;padding-right:6px}
+    .cart-item{display:flex;gap:12px;padding:10px 6px;border-radius:10px;align-items:center}
+    .cart-item img{width:56px;height:56px;border-radius:8px;object-fit:cover}
+    .cart-item .meta{flex:1}
+    .cart-item .meta h4{margin:0;font-size:0.95rem}
+    .cart-item .meta p{margin:6px 0 0;color:var(--muted);font-size:0.88rem}
+    .cart-footer{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    .checkout-btn{padding:10px 12px;border-radius:12px;background:var(--accent-grad);border:0;color:white;font-weight:800}
+
+    /* ===== Pages (single-file multipage views) ===== */
+    .view{display:none}
+    .view.active{display:block}
+
+    /* ===== Forms, About, Contact ===== */
+    .card-form{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px}
+    label{display:block;font-weight:700;margin-bottom:8px}
+    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    /* ===== Footer ===== */
+    footer{margin-top:36px;text-align:center;color:var(--muted)}
+
+    /* ===== Utilities ===== */
+    .row{display:flex;gap:12px;align-items:center}
+    .muted{color:var(--muted)}
+
+    /* ===== Responsive ===== */
+    @media(max-width:920px){
+      .hero{grid-template-columns:1fr;}
+      .hero-visual{order:-1}
+      .site{padding:18px}
+      .cart-panel{right:10px;left:10px;width:auto}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="site">
+    <!-- APP BAR -->
+    <header class="appbar">
+      <div class="brand">
+        <div class="logo">AC</div>
+        <div>
+          <h1>Arcade Commerce</h1>
+          <div class="muted" style="font-size:12px">Modern demo store</div>
+        </div>
+      </div>
+
+      <nav class="topnav" aria-label="Main navigation">
+        <a class="nav-link" href="#" data-link="home">Home</a>
+        <a class="nav-link" href="#" data-link="products">Products</a>
+        <a class="nav-link" href="#" data-link="about">About</a>
+        <a class="nav-link" href="#" data-link="contact">Contact</a>
+        <div class="badge nav-link" title="Cart" id="open-cart">🛒 <span id="cart-count">0</span></div>
+      </nav>
+    </header>
+
+    <!-- VIEWS (Single-file multipage) -->
+
+    <!-- HOME -->
+    <main id="home" class="view active">
+      <section class="hero">
+        <div class="hero-card">
+          <span class="kicker">New arrivals</span>
+          <h2>Design-forward gadgets & lifestyle essentials
+          <br><span style="font-weight:600;color:var(--muted);font-size:0.9rem">Curated products, premium feel</span></h2>
+          <p>Shop beautiful objects with refined design, fast shipping and delightful unboxing. Built for creators, makers and design lovers.</p>
+
+          <div class="cta-row">
+            <button class="btn btn-primary" data-link="products">Shop collection</button>
+            <button class="btn btn-ghost" id="scroll-feature">See features</button>
+          </div>
+
+          <div style="margin-top:18px;color:var(--muted);font-size:0.95rem">Free delivery over <strong>$99</strong> • 30-day returns • Secure payments</div>
+
+        </div>
+
+        <div class="hero-visual">
+          <div class="orb" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <h3>Featured products</h3>
+          <div class="muted">Handpicked for you</div>
+        </div>
+
+        <div class="grid" id="products-grid">
+          <!-- products inserted by JS -->
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <h3>Why Arcade?</h3>
+          <div class="muted">Experience the difference</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          <div class="card product" style="padding:20px;text-align:center">
+            <h4>Design-led</h4>
+            <p class="muted">Every product selected for quality and aesthetics.</p>
+          </div>
+          <div class="card product" style="padding:20px;text-align:center">
+            <h4>Curation</h4>
+            <p class="muted">Simplified collection — no overwhelm.</p>
+          </div>
+          <div class="card product" style="padding:20px;text-align:center">
+            <h4>Support</h4>
+            <p class="muted">Fast replies & smooth returns.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- PRODUCTS -->
+    <section id="products" class="view">
+      <div class="section-title"><h3>All Products</h3><div class="muted">Browse everything</div></div>
+      <div class="grid" id="all-products-grid"></div>
+    </section>
+
+    <!-- PRODUCT DETAIL (dynamic) -->
+    <section id="product-detail" class="view">
+      <div class="section-title"><h3 id="pd-title">Product</h3><div class="muted" id="pd-sub"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="hero-visual" style="height:420px;border-radius:14px;align-items:flex-start;padding:24px">
+          <img id="pd-image" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+        </div>
+        <div>
+          <div class="card-form">
+            <h2 id="pd-name"></h2>
+            <div class="muted" id="pd-desc"></div>
+            <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px;font-weight:800;color:var(--accent-1)" id="pd-price"></div>
+              <button class="add-btn" id="pd-add">Add to cart</button>
+            </div>
+
+            <div style="margin-top:18px">
+              <label>Quantity</label>
+              <input type="number" id="pd-qty" value="1" min="1" style="width:120px">
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CART / CHECKOUT -->
+    <section id="checkout" class="view">
+      <div class="section-title"><h3>Checkout</h3><div class="muted">Complete your order</div></div>
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:20px">
+        <div>
+          <div class="card-form">
+            <h4>Shipping details</h4>
+            <label>Full name</label>
+            <input id="fn" placeholder="John Doe">
+            <label>Address</label>
+            <input id="addr" placeholder="Street, city, country">
+            <label>Email</label>
+            <input id="email" placeholder="you@email.com">
+          </div>
+
+          <div style="margin-top:14px;text-align:center">
+            <button class="btn btn-primary" id="place-order">Place order</button>
+          </div>
+        </div>
+
+        <aside class="card product">
+          <h4>Order summary</h4>
+          <div id="summary-list" style="margin-top:12px"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:12px;font-weight:800"><div>Total</div><div id="summary-total">$0</div></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="view">
+      <div class="section-title"><h3>About Arcade</h3><div class="muted">Who we are</div></div>
+      <div class="card product">
+        <h4>Our mission</h4>
+        <p class="muted">We craft a calm shopping experience; fewer distractions, better products. A demo store built to showcase modern UI design and smooth interactions.</p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="view">
+      <div class="section-title"><h3>Contact us</h3><div class="muted">Say hello</div></div>
+      <div class="card-form">
+        <label>Your message</label>
+        <textarea id="msg" rows="6" placeholder="Ask us anything..."></textarea>
+        <div style="margin-top:12px;text-align:right"><button class="btn btn-primary" id="send-msg">Send</button></div>
+      </div>
+    </section>
+
+    <!-- THANK YOU -->
+    <section id="thanks" class="view">
+      <div class="section-title"><h3>Thank you</h3><div class="muted">Order placed</div></div>
+      <div class="card product" style="text-align:center;padding:28px">
+        <h3>Order received 🎉</h3>
+        <p class="muted">We emailed you the receipt. Your package will ship soon.</p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="muted">© Arcade Commerce — Demo store. Built with ❤️</div>
+    </footer>
+
+  </div>
+
+  <!-- CART PANEL (floating) -->
+  <div class="cart-panel" id="cart-panel" aria-live="polite">
+    <div class="cart-header">
+      <strong>Your cart</strong>
+      <button id="close-cart" style="background:none;border:0;color:var(--muted);cursor:pointer">Close</button>
+    </div>
+    <div class="cart-list" id="cart-list"></div>
+    <div class="cart-footer">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px"><div class="muted">Subtotal</div><div id="cart-sub">$0</div></div>
+      <div style="margin-top:12px"><button class="checkout-btn" id="goto-checkout">Go to checkout</button></div>
+    </div>
+  </div>
+
+  <!-- Internal JS (handles navigation, products, cart, animations) -->
+  <script>
+    // ===== Demo product data =====
+    const PRODUCTS = [
+      {id:1,name:'Aero Earphones',price:49,desc:'Lightweight, great sound',img:'https://picsum.photos/id/1005/600/400'},
+      {id:2,name:'Nimbus Lamp',price:79,desc:'Soft ambient desk lamp',img:'https://picsum.photos/id/1011/600/400'},
+      {id:3,name:'Orbit Bottle',price:29,desc:'Vacuum insulated bottle',img:'https://picsum.photos/id/1025/600/400'},
+      {id:4,name:'Canvas Wallet',price:39,desc:'Minimal everyday wallet',img:'https://picsum.photos/id/1027/600/400'},
+      {id:5,name:'Wrist Band Pro',price:59,desc:'Fitness band with style',img:'https://picsum.photos/id/1035/600/400'},
+      {id:6,name:'Slate Notebook',price:19,desc:'Recycled paper notebook',img:'https://picsum.photos/id/1042/600/400'}
+    ];
+
+    // ===== Utilities =====
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    // ===== Render functions =====
+    function renderGrid(containerId, list){
+      const el = document.getElementById(containerId);
+      el.innerHTML = '';
+      list.forEach(p => {
+        const node = document.createElement('div'); node.className='product';
+        node.innerHTML = `
+          <div class="product-media"><img src="${p.img}" alt="${p.name}"></div>
+          <div style="padding-top:8px">
+            <div class="p-title">${p.name}</div>
+            <div class="p-desc">${p.desc}</div>
+            <div class="p-foot">
+              <div class="price">$${p.price}</div>
+              <button class="add-btn" data-id="${p.id}">Add</button>
+            </div>
+          </div>`;
+        el.appendChild(node);
+      })
+    }
+
+    // initial render
+    renderGrid('products-grid', PRODUCTS.slice(0,4));
+    renderGrid('all-products-grid', PRODUCTS);
+
+    // ===== Simple routing (single-file views) =====
+    function showView(id){
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // nav links
+    document.querySelectorAll('[data-link]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const dest = e.currentTarget.getAttribute('data-link');
+        showView(dest);
+      })
+    })
+
+    // topnav anchors
+    document.querySelectorAll('.nav-link').forEach(n=>{
+      n.addEventListener('click', e=>{
+        e.preventDefault();
+        const link = e.currentTarget.getAttribute('data-link'); if(link) showView(link);
+      })
+    })
+
+    // product click handlers (delegation)
+    document.addEventListener('click', e=>{
+      if(e.target.matches('.add-btn')){
+        const id = Number(e.target.dataset.id);
+        addToCart(id,1);
+      }
+      if(e.target.closest('.product-media')){
+        const pnode = e.target.closest('.product');
+        if(!pnode) return;
+        // find product id by matching image src
+        const img = pnode.querySelector('img');
+        const prod = PRODUCTS.find(p=>p.img===img.src || img.src.includes(String(p.id)));
+        if(prod) openProduct(prod.id);
+      }
+    })
+
+    // open product detail by id
+    function openProduct(id){
+      const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
+      $('#pd-image').src=p.img;
+      $('#pd-name').textContent=p.name;
+      $('#pd-desc').textContent=p.desc;
+      $('#pd-price').textContent='$'+p.price;
+      $('#pd-title').textContent=p.name;
+      $('#pd-sub').textContent=p.desc;
+      $('#pd-add').dataset.id=p.id;
+      showView('product-detail');
+    }
+
+    // product detail add
+    $('#pd-add').addEventListener('click', e=>{
+      const id = Number(e.currentTarget.dataset.id);
+      const qty = Number($('#pd-qty').value||1);
+      addToCart(id,qty);
+      alert('Added to cart');
+    })
+
+    // cart state
+    let CART = JSON.parse(localStorage.getItem('arc_cart')||'[]');
+    function saveCart(){ localStorage.setItem('arc_cart', JSON.stringify(CART)); }
+
+    function addToCart(id, qty=1){
+      const prod = PRODUCTS.find(p=>p.id===id); if(!prod) return;
+      const existing = CART.find(i=>i.id===id);
+      if(existing) existing.qty += qty; else CART.push({id:prod.id, name:prod.name, price:prod.price, img:prod.img, qty});
+      saveCart(); updateCartUI();
+    }
+
+    function updateCartUI(){
+      const list = $('#cart-list'); list.innerHTML='';
+      let subtotal=0; let count=0;
+      CART.forEach(item=>{
+        subtotal += item.price*item.qty; count += item.qty;
+        const node = document.createElement('div'); node.className='cart-item';
+        node.innerHTML = `<img src="${item.img}" alt=""><div class="meta"><h4>${item.name}</h4><p>$${item.price} × ${item.qty}</p></div><div><button data-id="${item.id}" class="nav-link" style="background:transparent">Remove</button></div>`;
+        list.appendChild(node);
+      });
+      $('#cart-sub').textContent = '$'+subtotal.toFixed(2);
+      $('#cart-count').textContent = count;
+      $('#summary-total').textContent = '$'+subtotal.toFixed(2);
+
+      // summary list
+      const sl = $('#summary-list'); sl.innerHTML='';
+      CART.forEach(i=>{ const d = document.createElement('div'); d.style.display='flex'; d.style.justifyContent='space-between'; d.style.marginBottom='8px'; d.innerHTML = `<div>${i.name} × ${i.qty}</div><div>$${(i.price*i.qty).toFixed(2)}</div>`; sl.appendChild(d); });
+
+      saveCart();
+    }
+
+    // remove handler (delegation)
+    document.getElementById('cart-list').addEventListener('click', e=>{
+      if(e.target.matches('button')){
+        const id = Number(e.target.dataset.id);
+        CART = CART.filter(i=>i.id!==id); updateCartUI();
+      }
+    })
+
+    // cart panel open/close
+    $('#open-cart').addEventListener('click', ()=>{ $('#cart-panel').style.display='block'; $('#cart-panel').style.transform='translateY(0)'; });
+    $('#close-cart').addEventListener('click', ()=>{ $('#cart-panel').style.transform='translateY(12px)'; $('#cart-panel').style.display='none'; });
+
+    // goto checkout
+    $('#goto-checkout').addEventListener('click', ()=>{ showView('checkout'); $('#cart-panel').style.display='none'; });
+
+    // place order
+    $('#place-order').addEventListener('click', ()=>{
+      // basic validation
+      const fn = $('#fn').value.trim(); const addr = $('#addr').value.trim(); const email = $('#email').value.trim();
+      if(!fn||!addr||!email){ alert('Please complete shipping details'); return; }
+      // pretend to place order
+      localStorage.removeItem('arc_cart'); CART=[]; updateCartUI(); showView('thanks');
+    })
+
+    // send message
+    $('#send-msg').addEventListener('click', ()=>{ const m = $('#msg').value.trim(); if(!m){ alert('Type a message'); return;} alert('Message sent!'); $('#msg').value=''; })
+
+    // add to cart from grid
+    document.body.addEventListener('click', e=>{
+      if(e.target.matches('.add-btn') && e.target.dataset.id){
+        addToCart(Number(e.target.dataset.id),1);
+        // small pulse feedback
+        e.target.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:250,easing:'ease-out'});
+      }
+    })
+
+    // links that open product
+    // make images clickable
+
+    // init
+    updateCartUI();
+
+    // product detail if opened from grid by clicking title
+    document.querySelectorAll('#products-grid .product, #all-products-grid .product').forEach(n=>{
+      // handled by delegation earlier
+    })
+
+    // static open first product on load for demo
+    // animation: fade in products
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.querySelectorAll('.product').forEach((p,i)=>{ p.style.opacity=0; p.style.transform='translateY(12px)'; setTimeout(()=>{ p.style.transition='all .5s var(--ease)'; p.style.opacity=1; p.style.transform='translateY(0)'; }, i*90)});
+    });
+
+    // keyboard: press 'c' to toggle cart
+    document.addEventListener('keydown', e=>{ if(e.key==='c') { $('#cart-panel').style.display = $('#cart-panel').style.display==='block'?'none':'block'; } })
+
+    // smooth scroll to features
+    $('#scroll-feature').addEventListener('click', ()=>{ document.querySelector('.section').scrollIntoView({behavior:'smooth'}); });
+
+    // small accessibility: set focus to first nav link
+    document.querySelector('.nav-link')?.focus();
+
+  </script>
+</body>
+</html>
